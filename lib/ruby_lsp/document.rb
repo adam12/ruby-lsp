@@ -142,6 +142,17 @@ module RubyLsp
       # Finds the character index inside the source string for a given line and column
       sig { params(position: T::Hash[Symbol, T.untyped]).returns(Integer) }
       def find_char_position(position)
+        info_t = Thread.new do
+          sleep 10
+
+          puts "Looking for char position for over 10 seconds. Starting debug loop."
+
+          loop do
+            puts "POS: #{@pos} Encoding: #{@encoding} CurrentLine: #{@current_line}")
+            sleep 0.5
+          end
+        end
+
         # Find the character index for the beginning of the requested line
         until @current_line == position[:line]
           @pos += 1 until LINE_BREAK == @source[@pos]
@@ -156,6 +167,9 @@ module RubyLsp
         if @encoding == Encoding::UTF_16LE
           requested_position -= utf_16_character_position_correction(@pos, requested_position)
         end
+
+        info_t.kill
+        info_t.join
 
         requested_position
       end
